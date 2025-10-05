@@ -1,70 +1,29 @@
-#include<bits/stdc++.h>
-
+#include <bits/stdc++.h>
 using namespace std;
-const int sl = 1e5+5;
 
-int a[sl];
-
-map<int,int> t[sl];
-
-int n,q;
-
-int blocksize = 400;
-
-int getBlock(int idx){
-	return (idx-1)/blocksize +1;
-}
-
-signed main(){
-	ios_base::sync_with_stdio(0),cin.tie(0),cout.tie(0);
-	cin>>n>>q;
-	//blocksize = sqrt(n)+1;
-	for (int i=1;i<=n;i++){
-		cin>>a[i];
-		t[getBlock(i)][a[i]]++;
-	}
-
-	for (int i=0;i<q;i++){
-		int l,r,x;
-		cin>>l>>r>>x;
-		int u = getBlock(l);
-		int v = getBlock(r);
-		//cout<<u<<" "<<v<<"\n";
-		if (u == v){
-			map <int,int> s;
-			int sum = 0;
-			for (int i=l;i<=r;i++){
-				s[a[i]]++;				
-			}
-			for (auto it = s.begin();it!=s.end();it++){
-				if ((*it).second == x){
-					sum++;
-				}
-			}
-			cout<<sum<<"\n";
-			continue;
-		}
-		int sum = 0;
-		map <int,int> s;
-		for (int i=u+1;i<v;i++){
-			for (auto it = t[i].begin();it!=t[i].end();it++){
-				s[(*it).first] += (*it).second;
-			}
-		}
-		
-		for (int i=l;i<=u*blocksize;i++){					
-			s[a[i]]++;
-		}
-		for (int i=r;i>(v-1)*blocksize;i--){
-			s[a[i]]++;
-		}
-		for (auto it = s.begin();it!=s.end();it++){
-			//cout<<"DSDSD";
-			if ((*it).second == x){
-				sum++;
-			}
-		}									
-		cout<<sum<<"\n";
-	}
-	
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n;
+    cin >> n;
+    vector<long long> A(n), B(n);
+    for (auto &x : A) cin >> x;
+    for (auto &x : B) cin >> x;
+    vector<vector<long long>> dp(n, vector<long long>(n));
+    long long ans = LLONG_MIN;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            long long prod = A[i] * B[j];
+            long long val;
+            if (i == 0 || j == 0) {
+                val = prod;
+            } else {
+                long long prev = dp[i - 1][j - 1];
+                val = prod + (prev > 0 ? prev : 0LL);
+            }
+            dp[i][j] = val;
+            ans = max(ans, val);
+        }
+    }
+    cout << ans << '\n';
 }
