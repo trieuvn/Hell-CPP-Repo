@@ -2,26 +2,68 @@
 #define int long long
 
 using namespace std;
-const int MAX = 1e6+5;
 
-int t,n;
-map<int,int> dp;
+typedef struct choice{
+	int w;
+	int v;
+}choice;
 
-int solve(int x){
-	if (x == 1)	return 0;
-	if (dp[x] != 0) return dp[x];
-	if (x % 2 == 0){
-		return dp[x] = 1+solve(x/2);
-	}else{
-		return dp[x] = 1+solve(3*x+1);
+bool cmp(choice A, choice B){
+	if (A.w == B.w){
+		return A.v > B.v;
 	}
+	return A.w < B.w;
 }
 
+int n,s;
+vector<choice> dachon;
+vector<choice> dabo;
+
 signed main(){
-	ios_base::sync_with_stdio(0),cin.tie(0),cout.tie(0);
-	cin>>t;
-	while (t--){
-		cin>>n;
-		cout<<solve(n)<<"\n";
+	cin>>n>>s;
+	int w,v,c;
+	int curw = 0;
+	int totalval = 0;
+	for (int i=0;i<n;i++){
+		choice in;
+		cin>>w>>v>>c;
+		in.w = w;
+		in.v = v;
+		if (c == 1){
+			curw += in.w;
+			totalval += in.v;
+			dachon.push_back(in);
+		}
+		if (c == 0){
+			dabo.push_back(in);
+		}
 	}
+	
+	int Max = totalval;
+	sort(dachon.begin(),dachon.end(),cmp);
+	sort(dabo.begin(),dabo.end(),cmp);
+	int j = 0;
+	int bestChoiceVal = 0;
+	for (choice cur : dachon){
+		int tempw = curw;
+		int tempv = totalval;
+		tempw -= cur.w;
+		tempv -= cur.v;
+		
+//		for (choice bo : dabo){
+//			if (bo.w + tempw <= s){
+//				Max = max(Max, tempv + bo.v);
+//			}
+//		}
+		
+		bool isloop = true;
+		
+		while (j < dabo.size() && dabo[j].w + tempw <= s){
+			bestChoiceVal = max(bestChoiceVal, dabo[j].v);
+			j++;
+		}
+		Max = max(Max, tempv + bestChoiceVal);
+	}
+	
+	cout<<Max;
 }
